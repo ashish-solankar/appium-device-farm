@@ -1,3 +1,9 @@
+## [12.0.1](https://github.com/AppiumTestDistribution/appium-device-farm/compare/v12.0.0...v12.0.1) (2026-07-25)
+
+### Bug Fixes
+
+* Fix/2035 delete user 404 ([#2057](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2057)) ([53a6996](https://github.com/AppiumTestDistribution/appium-device-farm/commit/53a6996046fe5d5ee2e4d11cf8d80eefac54c239)), closes [#2035](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2035)
+
 ## [12.0.0](https://github.com/AppiumTestDistribution/appium-device-farm/compare/v11.3.2...v12.0.0) (2026-07-25)
 
 ### ⚠ BREAKING CHANGES
