@@ -1,3 +1,97 @@
+## [12.0.1](https://github.com/AppiumTestDistribution/appium-device-farm/compare/v12.0.0...v12.0.1) (2026-07-25)
+
+### Bug Fixes
+
+* Fix/2035 delete user 404 ([#2057](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2057)) ([53a6996](https://github.com/AppiumTestDistribution/appium-device-farm/commit/53a6996046fe5d5ee2e4d11cf8d80eefac54c239)), closes [#2035](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2035)
+
+## [12.0.0](https://github.com/AppiumTestDistribution/appium-device-farm/compare/v11.3.2...v12.0.0) (2026-07-25)
+
+### ⚠ BREAKING CHANGES
+
+* Manual device control and live device streaming have been
+removed from the dashboard. Stay on 11.x if you rely on them.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+Co-authored-by: Srinivasan Sekar <srinivasan.sekar1990@gmail.com>
+
+* fix: readme
+
+Co-authored-by: Srinivasan Sekar <srinivasan.sekar1990@gmail.com>
+
+* fix: repair the broken build by typing the iOS manifest cache
+
+`npm run bundle` has been failing on main since the public move, which took
+every CI job down with it: Build with Out Submodule, Run Unit Test, and both
+integration jobs all run `npm run bundle` before anything else.
+
+The cause is `MANIFEST_CACHE` in appInfoIOS.ts. It was annotated with a JSDoc
+`@type {LRUCache<string, StringRecord>}` comment, but JSDoc type annotations
+are ignored in .ts files, so the cache was inferred as `LRUCache<{}, {}>`.
+Every read off it produced `{} | undefined`, which is why `CFBundleIdentifier`
+and friends could not be indexed. Replaced the comment with real generics and
+gave `put`/`_putIpa`/`_putApp`/`_readPlist` explicit `StringRecord` returns.
+`_putApp` now narrows through a single `get` instead of `has` + `get`.
+
+Also applies prettier to helpers.ts and plugin.ts, which were failing
+`npm run prettier-check` (the "Run lint" step) on main.
+
+Verified locally: `npm run bundle` compiles and webpack emits, `npm test`
+passes 126 tests, `npm run prettier-check` is clean.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+Co-authored-by: Srinivasan Sekar <srinivasan.sekar1990@gmail.com>
+
+* feat!: remove live-video backend endpoint and getLiveVideoUrl from all session classes
+
+Remove the /session/:sessionId/liveVideo route, streamLiveSessionVideo handler,
+MjpegProxy usage, and getLiveVideoUrl() from all session classes to match the
+v12.0.0 breaking-change notice in the README. Also remove the LIVE_VIDEO
+capability and mjpegServerPort allocation from CapabilityManager and
+device-utils since these were solely for the removed live-streaming feature.
+
+* ci: pin the conventional-commits preset to the last CommonJS release
+
+The Conventional Commits check has been failing on every PR, not just this
+one, and it never got as far as reading the PR title:
+
+  Installing preset package conventional-changelog-angular@latest
+  Error: Preset "conventional-changelog-angular" does not exist.
+  [cause]: Package path . is not exported from
+           node_modules/conventional-changelog-angular
+
+beemojs/conventional-pr-action installs the preset at run time and resolves
+it with a CommonJS loader. `config-version` defaults to `latest`, and every
+conventional-changelog preset went ESM-only at v8 - `type: module`, an
+`exports` map carrying only an `import` condition, and no `main`. The moment
+angular v8 became `latest` the loader could no longer require it, so the
+action aborted before validating anything. Latest is now 9.2.1; 7.0.0 was
+the last release with a plain `main: index.js`.
+
+Pinned to `config-version: 7` so a future major cannot break the job again.
+
+Switched the preset from angular to conventionalcommits at the same time.
+Angular's header pattern is /^(\w*)(?:\((.*)\))?: (.*)$/, which rejects the
+`feat!:` breaking-change marker outright; conventionalcommits uses
+/^(\w*)(?:\((.*)\))?!?: (.*)$/ and also exposes breakingHeaderPattern. It is
+already the preset .releaserc uses for release-notes-generator, so this makes
+the title check agree with how the release notes are generated.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+Co-authored-by: Srinivasan Sekar <srinivasan.sekar1990@gmail.com>
+
+### Features
+
+* remove manual device control and drop the vulnerable ip depend… ([#2056](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2056)) ([90d1b1f](https://github.com/AppiumTestDistribution/appium-device-farm/commit/90d1b1f6056ed0238ba99f7a07d84be5d15ffa28))
+* using original filename in capability ([#2028](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2028)) ([562166c](https://github.com/AppiumTestDistribution/appium-device-farm/commit/562166c59dfa1f5997cbeadceb297823c872daa9))
+
+### Bug Fixes
+
+* **iProxy:** guard releaseConnection against undefined port ([#2051](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2051)) ([d1ad9ba](https://github.com/AppiumTestDistribution/appium-device-farm/commit/d1ad9ba9530aa10e422b68c351b8f5e524c925f1))
+* only delete session if request path is strictly "/session/:sessionId" ([#2036](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2036)) ([#2037](https://github.com/AppiumTestDistribution/appium-device-farm/issues/2037)) ([9af368a](https://github.com/AppiumTestDistribution/appium-device-farm/commit/9af368ad9aceb61eb85362f4d4941a8f807f9fe7))
+
 ## [11.3.2](https://github.com/AppiumTestDistribution/appium-device-farm/compare/v11.3.1...v11.3.2) (2025-12-29)
 
 ### Bug Fixes
